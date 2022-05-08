@@ -3,30 +3,58 @@ const express = require("express");
 const router = express.Router();
 router.use(express.json());
 const admin = require('firebase-admin');
+const app = require("../../app");
+const utils = require("./Utils");
 
+
+const actionCodeSettings = {
+
+  url: 'https://console.firebase.google.com/',
+  handleCodeInApp: true,
+  android: {
+    packageName: 'com.example.classmanagerandroid',
+    installApp: true,
+    minimumVersion: '12',
+  },
+
+};
 
 //Authentication
 router.post("/register",async (req,res) => {
-    
+    let newUser = {}
+
     admin.auth()
-    .createUser({
-      email: req.body.email,
-      emailVerified: false,
-      password: req.body.password,
-      //phoneNumber: '+11234567890',
-      displayName: 'Default name',
-      photoURL: '',
-      disabled: false
-    })
-    .then(function(userRecord) {
-      
-      console.log('Successfully created new user:', userRecord.uid);
-    })
+      .createUser({
+        email: req.body.email,
+        emailVerified: false,
+        password: req.body.password,
+        //phoneNumber: '+11234567890',
+        displayName: 'Default name',
+        photoURL: 'gs://class-manager-58dbf.appspot.com/user/defaultUserImg.png',
+        disabled: false
+      })
+      .then(function(userRecord) { 
+        newUser = {
+          "id": userRecord.uid,
+          "email": userRecord.email,
+          "courses": new Array(),
+          "classes": new Array(),
+          "name": "userName",
+          "imgPath": userRecord.photoURL,
+          "description": "myDescription"
+        } 
+
+        app.getDatabase().collection("users").doc(userRecord.uid).set(newUser)
+        console.log('Successfully created new user:', userRecord.uid);
+      })
       .catch(function(error) {
-      console.log('Error creating new user:', error);
+        console.log('Error creating new user:', error);
       });
+
+      res.send(newUser)
       res.end();
 });
+
 
 router.post("/login",async (req,res) => {
   admin.auth()
@@ -52,16 +80,38 @@ router.post("/login",async (req,res) => {
     res.end();
 });
 
-function deleteUser(uid) {
+router.post("/deleteAccount/:uid", async (req,res) => {
+  let uid = req.params.uid
+    console.log(uid);
     admin.auth()
     .deleteUser(uid)
     .then(() => {
-      console.log('Successfully deleted user');
+      console.log('Successfully deleted account');
+      app.getDatabase().collection("users").doc(uid).delete()
+
     })
     .catch((error) => {
-      console.log('Error deleting user:', error);
+      console.log('Error deleting account:', error);
     });
-}
+    res.end();
+});
+
+router.post("/updatePasswordByEmail/:email", async (req,res) => {
+  
+  let userEmail = req.params.email
+    admin.auth()
+    .generatePasswordResetLink(userEmail)
+    .then((link) => {
+      console.log('email sent!');
+
+      return sendCustomPasswordResetEmail(userEmail, displayName, link);
+    })
+    .catch((error) => {
+      console.log(error)
+    });
+    
+});
+
 
 function updateUser() {
   getAuth()

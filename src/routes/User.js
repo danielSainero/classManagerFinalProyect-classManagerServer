@@ -1,8 +1,7 @@
 const express = require("express");
-const app = require("../../app");
 const router = express.Router();
 router.use(express.json());
-const utils = require("./Utils")
+const utils = require("./Utils");
 
 
 //Gets
@@ -17,7 +16,7 @@ router.get("/users",async (req,res) => {
 
 router.get("/user/:id",async (req,res) => {
    
-    let id = parseInt(req.params.id)
+    let id = req.params.id
     let user = await utils.getDocumentFromCollectionById("users",id);
 
     if(user != null){
@@ -35,6 +34,11 @@ router.get("/user/:id",async (req,res) => {
 //Posts
 router.post("/user",async (req,res) => {
      utils.saveDocument("users",req.body,res,"Usuario insertado","Error al introducir el usuario");
+});
+
+//Put
+router.put("/user",async (req,res) => {
+    utils.updateDocument("users",req.body,res,"Usuario actualizado","Error al actualizar el usuario");
 });
 
 //Deletes

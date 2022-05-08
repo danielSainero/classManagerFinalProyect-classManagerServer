@@ -9,14 +9,20 @@ const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestor
 const serviceAccount = require('./data/keys/key-firebase.json');
 const admin = require('firebase-admin');
 
+
 //Create references to routes
 const users = require("./src/routes/User");
 const authentication = require("./src/routes/Authentication");
 const course = require("./src/routes/Course");
+const classFile = require("./src/routes/Class");
+const events = require("./src/routes/Event");
+const practice = require("./src/routes/Practice");
+const chat = require("./src/routes/Chat");
 
 //Connect to database
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://class-manager-58dbf-default-rtdb.firebaseio.com"
 });
 
 const db = getFirestore();
@@ -26,7 +32,11 @@ const db = getFirestore();
 //Rutear las peticiones
 server.use("/api", users);
 server.use("/api", authentication);
-server.use("/api", course)
+server.use("/api", course);
+server.use("/api", classFile);
+server.use("/api", events);
+server.use("/api", practice);
+server.use("/api", chat);
 
 //Iniciar servidor
 server.listen(port, () => {
