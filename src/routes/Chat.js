@@ -10,6 +10,7 @@ router.get("/practiceChat/:id",async (req,res) => {
     let chat = await utils.getDocumentFromCollectionById("practicesChats",id);
 
     if(chat != null){
+
         console.log("Chat devuelto");
         res.send(chat);
     }else{

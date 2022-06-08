@@ -22,11 +22,12 @@ const chat = require("./src/routes/Chat");
 //Connect to database
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://class-manager-58dbf-default-rtdb.firebaseio.com"
+  databaseURL: "https://class-manager-58dbf-default-rtdb.firebaseio.com",
+  storageBucket: "gs://class-manager-58dbf.appspot.com/"
 });
 
 const db = getFirestore();
-
+const storage = admin.storage()
 
 
 //Rutear las peticiones

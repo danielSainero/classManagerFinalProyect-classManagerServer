@@ -18,7 +18,6 @@ router.get("/user/:id",async (req,res) => {
    
     let id = req.params.id
     let user = await utils.getDocumentFromCollectionById("users",id);
-
     if(user != null){
         console.log("Usuario devuelto");
         res.send(user);
