@@ -34,7 +34,7 @@ router.post("/register",async (req,res) => {
         photoURL: 'https://firebasestorage.googleapis.com/v0/b/class-manager-58dbf.appspot.com/o/user%2FdefaultUserImg.png?alt=media&token=6bc2760b-bd3c-4ef9-a6c1-613f9db9d4c3',
         disabled: false
       })
-      .then(function(userRecord) { 
+      .then(async function(userRecord) { 
         newUser = {
           "id": userRecord.uid,
           "email": userRecord.email,
@@ -43,10 +43,10 @@ router.post("/register",async (req,res) => {
           "name": "userName",
           "imgPath": "gs://class-manager-58dbf.appspot.com/user/defaultUserImg.png",
           "description": "myDescription",
-          "password": req.body.password
+          "password": req.body.passwordSha256
         } 
 
-        app.getDatabase().collection("users").doc(userRecord.uid).set(newUser)
+        await app.getDatabase().collection("users").doc(userRecord.uid).set(newUser)
         res.send(newUser);
         res.end();
         console.log('Successfully created new user:', userRecord.uid);
@@ -65,7 +65,7 @@ router.post("/login",async (req,res) => {
   .then(async (userRecord) => {
     let user =  await  utils.getDocumentFromCollectionById("users",userRecord.uid);
 
-    if(user.password == req.body.password) {
+    if(user.password == req.body.passwordSha256) {
       res.send(user)
       res.end();
     }
